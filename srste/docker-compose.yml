@@ -1,0 +1,25 @@
+version: '3'
+services:
+  impex:
+    image: srste/srste:1.0.0.full
+    #command: npm run debug
+    command: npm run single
+    environment:
+      - NODE_ENV=production
+      - NODE_ID=srste1
+      - DB_USER=proxyuser
+      - DB_PORT=3306
+      - DB_HOST=172.105.60.34
+      - DB_PASSWORD=srstee
+      - DB_DATABASE=srstee
+      - REDIS=172.105.60.34:6379
+      - USE_REDIS=true
+      - WORKFLOW_URL=http://172.105.60.34:8091
+    #command: npm run start
+    #command: node -e 'setTimeout(()=>console.log("Test!"), 10000000)'
+    ports:
+     - "8011:8080"
+     - "2222:2222"
+    restart: always
+volumes:
+    db_data:

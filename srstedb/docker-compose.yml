@@ -1,0 +1,18 @@
+version: '3'
+services:
+  mydb:
+    image: mysql:5.7
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./docker/provision/mysql/init:/docker-entrypoint-initdb.d
+      - ./my.cnf:/etc/mysql/my.cnf
+    restart: always
+    ports:
+     - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: srstee
+      MYSQL_DATABASE: srstee
+      MYSQL_USER: proxyuser
+      MYSQL_PASSWORD: srstee
+volumes:
+    db_data:

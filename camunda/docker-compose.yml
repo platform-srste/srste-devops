@@ -1,0 +1,30 @@
+version: '3'
+services:
+  mydb1:
+    image: mysql:5.7
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./docker/provision/mysql/init:/docker-entrypoint-initdb.d
+    #restart: always
+    ports:
+     - "3308:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: srstee
+      MYSQL_DATABASE: camunda_db
+      MYSQL_USER: proxyuser
+      MYSQL_PASSWORD: srstee
+  camunda:
+    depends_on:
+      - mydb1
+    image: camunda/camunda-bpm-platform:latest
+    container_name: camunda1
+    environment:
+      DB_DRIVER: com.mysql.jdbc.Driver
+      DB_URL: jdbc:mysql://45.126.125.130:3308/camunda_db?autoReconnect=true
+      DB_USERNAME: proxyuser
+      DB_PASSWORD: srstee
+    ports:
+     - "8091:8080"
+    restart: always
+volumes:
+    db_data:
