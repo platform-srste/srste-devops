@@ -36,11 +36,16 @@ Step 9 - Persist the updated database image into the container
     > docker commit <container-id> srste/srste:2.0.0 
 Step 10 - Push docker image to registry 
     > docker push srste/srste:2.0.0
-Step 11 - Hard restart docker container 
+Step 11 - Refresh caches from redis
+    > cache/mmf.getSchemaData
+    > reload_cache
+    > cache/bundle_core
+    > cache/bundle_debug_core 
+Step 12 - Hard restart docker container 
     > docker-compose down -v
     > docker-compose run --service-ports impex2
-Step 12 - Run Automation tests 
-Step 13 - Publish results 
+Step 13 - Run Automation tests 
+Step 14 - Publish results 
 
 Upgrade Scenario - 
 
@@ -60,10 +65,15 @@ Step 6 - Push ootb contents downloaded from step#3 to production instance of srs
     > docker exec -it <pratisrste-container-id> npm run push <production-node-ip> <production-node-port> 
     > docker exec -it <pratisrste-container-id> npm run push-bundle <production-node-ip> <production-node-port> 
 Step 7 - Update production instance docker-compose.yml to reflect the latest version
-Step 8 - Hard restart docker container 
+Step 8 - Refresh caches from redis
+    > cache/mmf.getSchemaData
+    > reload_cache
+    > cache/bundle_core
+    > cache/bundle_debug_core
+Step 9 - Hard restart docker container 
     > cd /srste
     > docker-compose down -v
     > docker-compose run --service-ports impex2
-Step 9 - Run Automation tests 
-Step 10 - Publish results
+Step 10 - Run Automation tests 
+Step 11 - Publish results
 
