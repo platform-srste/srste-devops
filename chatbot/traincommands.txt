@@ -1,0 +1,43 @@
+curl -X POST \
+  http://localhost:5005/model/train \
+  -H 'Accept-Encoding: gzip, deflate' \
+  -H 'Content-Type: application/json' \
+  -d '{
+"config": "language: en\npipeline:\n - name: WhitespaceTokenizer\n - name: RegexFeaturizer\n - name: CRFEntityExtractor\n - name: EntitySynonymMapper\n - name: CountVectorsFeaturizer\n - name: EmbeddingIntentClassifier\npolicies:\n - name: MemoizationPolicy\n - name: KerasPolicy\n - name: MappingPolicy\n - name: FormPolicy\n",
+"nlu": "## intent:new_intent_to_train_on\n - new_utter_to_train_on for new_entity_to_train_on_value\n - new_utter_to_train_on for new_entity_to_train_on_value\n## intent:greet\n - hey\n - hello\n## intent:goodbye\n - cu\n - goodbye\n## intent:mood_great\n - Great!!\n - happy\n## intent:mood_unhappy\n - sad\n - Terrible",
+"stories": "##new_intent_to_train_on Path from model train without utter_slot_values\n* greet\n - utter_greet\n* new_intent_to_train_on\n - new_intent_to_train_on_form\n - form{\"name\": \"new_intent_to_train_on_form\"}\n - form{\"name\": null}\n\n## happy path\n * greet\n - utter_greet\n* mood_great\n - utter_happy\n\n## sad path 1\n * greet\n - utter_greet\n* mood_unhappy\n - utter_cheer_up\n",
+"domain": "entities:\n - new_entity_to_train_on\nintents:\n - new_intent_to_train_on\n - greet\n - goodbye\n - affirm\n - deny\n - mood_great\n - mood_unhappy\n\nactions:\n - utter_slots_values\n - utter_greet\n - utter_cheer_up\n - utter_did_that_help\n - utter_happy\n - utter_goodbye\ntemplates:\n utter_slots_values:\n - text: new_utter_output_to_send:\n\n- new_entity_to_train_message_values : {new_entity_to_train_on}\n\n\n utter_greet:\n - text: Hey! How are you?\n\n utter_cheer_up:\n - text: Here is something to cheer you up:\n image: https://i.imgur.com/nGF1K8f.jpg\\n\n utter_did_that_help:\n - text: Did that help you?\n\n utter_happy:\n - text: Great carry on!\n\n utter_goodbye:\n - text: Bye\n\nforms:\n - new_intent_to_train_on_form\nslots:\n new_entity_to_train_on:\n type: unfeaturized\n auto_fill: false",
+"out": "models",
+"force": true
+}'
+
+fetch("http://localhost:5005/webhooks/rest/webhook", {
+  "headers": {
+   "content-type": "application/json"
+  },
+  "body": "{\"sender\": \"test\", \"message\": \"hi\"}",
+  "method": "POST"
+ }).then((res)=>res.json()).then((d)=>console.log(d))
+
+
+from rasa_core_sdk import Action
+from rasa_core_sdk.events import SlotSet
+import requests 
+import json
+
+class ActionCheckRestaurants(Action):
+    def name(self):
+        # type: () -> Text
+        return "action_check_restaurants"
+
+    def run(self, dispatcher, tracker, domain):
+        # type: (CollectingDispatcher, Tracker, Dict[Text, Any]) -> List[Dict[Text, Any]]
+
+        cuisine = tracker.get_slot('cuisine')
+        
+        payload = {'text':'hi how are you?'}
+        headers = {'content-type': 'application/json'}
+        
+        r = requests.post('http://localhost:5005/model/parse', json=payload, headers=headers)
+        
+        return [SlotSet("matches", result if result is not None else [])]

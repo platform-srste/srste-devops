@@ -17,6 +17,10 @@ step 4 - Git clone all ootb modules to push default content to the container
     > git clone https://github.com/srste/core.git 
     > git clone https://github.com/srste/expense.git 
     > git clone https://github.com/srste/pos.git 
+Step 4.1 - Clean up the cloned directory keeping only the changed contents 
+    > Get last commit id from each repo in step#4
+    > git diff --name-only main..origin/main > diff.log 
+    > Iterate over the directory and remove all the files that are not included in diff.log 
 step 5 - Import content to pratisrste 
     > npm run app-reset [app-name] [app-directory] 
     Example: npm run app-reset expense ./expense     
@@ -25,6 +29,7 @@ step 6 - Bundle the ootb content before pushing to container
 step 7 - Push ootb contents to the container that is ran in step#3
     > npm run push 192.168.0.101 8012 //Look for the IP and port number from docker-compose configuration in step#3 
     > npm run push-bundle 192.168.0.101 8012 
+    > Update last commit id from each repo used in step#4 
 Step 8 - Push ootb contents to registry 
     > cd /pratisrste 
     > docker build -t srste/srste_contents:2.0.0 . 

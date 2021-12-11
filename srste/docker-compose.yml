@@ -2,7 +2,7 @@ version: '3'
 services:
   impex:
     image: srste/srste:1.0.0.full
-    command: npm run debug
+    #command: npm run debug
     #command: npm run single
     environment:
       - NODE_ENV=production
@@ -16,7 +16,7 @@ services:
       - USE_REDIS=true
       - WORKFLOW_URL=http://192.168.0.109:8091
     #command: npm run start
-    #command: node -e 'setTimeout(()=>console.log("Test!"), 10000000)'
+    command: node --max-old-space-size=16348 -e 'setTimeout(()=>console.log("Test!"), 10000000)'
     ports:
      - "8011:8080"
      - "2222:2222"
