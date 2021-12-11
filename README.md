@@ -81,4 +81,6 @@ Step 9 - Hard restart docker container
     > docker-compose run --service-ports impex2
 Step 10 - Run Automation tests 
 Step 11 - Publish results
+Step 12 -
 
+    
