@@ -1,0 +1,21 @@
+#command - docker build --no-cache --squash -t srste/chatbot:1.0.0 .
+FROM node:10-alpine
+
+WORKDIR /app/chatbot
+COPY actions /app/chatbot/actions
+COPY data /app/chatbot/data
+COPY models /app/chatbot/models
+COPY .config /app/chatbot
+COPY .keras /app/chatbot
+COPY .rasa /app/chatbot
+COPY config.yml /app/chatbot
+COPY credentials.yml /app/chatbot
+COPY domain.yml /app/chatbot
+COPY endpoints.yml /app/chatbot
+COPY README.md /app/chatbot
+COPY docker-compose.yml /app/chatbot
+
+WORKDIR /app/chatbot
+RUN pwd
+EXPOSE 8080
+CMD [ "node", "-e", "setTimeout(()=>console.log("Test!"), 10000000)"]
