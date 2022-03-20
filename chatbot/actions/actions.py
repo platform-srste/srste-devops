@@ -18,8 +18,7 @@ class ActionCustom(Action):
 
          payload = {'text':'hi how are you?', 'appId': 'appId2', 'intent': tracker.get_intent_of_latest_message(), 'slots': tracker.slots }
          headers = {'content-type': 'application/json'}
-         srsteEndpoint = os.environ.get("CHATBOT_SERVER_URL", "http://202.133.53.245:82");
-         
+         srsteEndpoint = os.environ["CHATBOT_SERVER_URL"];
          r = requests.post(srsteEndpoint + '/base/api/va_custom_action', json=payload, headers=headers)
          result = r.json()
          

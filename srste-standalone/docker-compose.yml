@@ -1,0 +1,86 @@
+version: '3.8'
+services:
+  mydb:
+    image: mysql:5.7
+    restart: always
+    command: --init-file /data/application/init.sql
+    environment:
+      MYSQL_DATABASE: srstee
+      #MYSQL_ALLOW_EMPTY_PASSWORD: ok
+      MYSQL_ROOT_PASSWORD: srstee
+      MYSQL_USER: proxyuser
+      MYSQL_PASSWORD: srstee
+      MYSQL_ROOT_HOST: '%'
+    ports:
+      - '3306:3306'
+    expose:
+      - 3306
+    volumes:
+      - db:/var/lib/mysql
+      - ./db/init.sql:/data/application/init.sql
+  camunda:
+    depends_on:
+      - mydb
+    image: camunda/camunda-bpm-platform:latest
+    environment:
+      #DB_DRIVER: com.mysql.jdbc.Driver
+      DB_HOST: mydb
+      #DB_URL: jdbc:mysql://workflow_db:3308/camunda_db?autoReconnect=true
+      DB_DATABASE: camunda_db
+      DB_USERNAME: camunda_user
+      DB_PASSWORD: srstee
+      DB_PORT: 3306
+    ports:
+      - "8080:8080"
+    expose:
+     - 8080
+    links: 
+      - mydb
+    restart: always
+  srste:
+    container_name: srste
+    image: srste/srste:1.0.0.full
+    command: npm run single
+    # command: node --max-old-space-size=16348 -e 'setTimeout(()=>console.log("Test!"), 10000000)'  
+    restart: always
+    depends_on:
+      - mydb
+      - cache
+      - camunda
+    ports:
+      - 8011:8080
+      - 2222:2222
+      - 9229:9229
+    expose:
+      - 8011
+      - 2222
+      - 9229
+    environment:
+      - NODE_ENV=production
+      - NODE_ID=srste1
+      - DB_USER=proxyuser
+      - DB_PORT=3306
+      #- DB_HOST=202.133.53.245
+      - DB_HOST=mydb
+      - DB_PASSWORD=srstee
+      - DB_DATABASE=srstee
+      - REDIS=cache:6379
+      - USE_REDIS=true
+      - WORKFLOW_URL=http://camunda:8080
+    links:
+      - mydb
+      - camunda
+  cache:
+    image: redis:6-alpine
+    user: root
+    environment:
+      # ALLOW_EMPTY_PASSWORD is recommended only for development.
+      - ALLOW_EMPTY_PASSWORD=yes
+      - REDIS_DISABLE_COMMANDS=FLUSHDB,FLUSHALL
+    ports:
+      - '6379:6379'
+volumes:
+  db:
+    driver: local
+  db_data: 
+    driver: local

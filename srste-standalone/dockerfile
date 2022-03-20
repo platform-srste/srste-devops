@@ -1,0 +1,31 @@
+FROM alpine:3.14
+
+# add our user and group first to make sure their IDs get assigned consistently, regardless of whatever dependencies get added
+RUN addgroup -S -g 1000 redis && adduser -S -G redis -u 999 redis
+# alpine already has a gid 999, so we'll use the next id
+
+RUN apk add --no-cache \
+# grab su-exec for easy step-down from root
+                'su-exec>=0.2' \
+# add tzdata for https://github.com/docker-library/redis/issues/138
+                tzdata
+
+ENV REDIS_VERSION 6.2.4
+ENV REDIS_DOWNLOAD_URL http://download.redis.io/releases/redis-6.2.4.tar.gz
+ENV REDIS_DOWNLOAD_SHA ba32c406a10fc2c09426e2be2787d74ff204eb3a2e496d87cff76a476b6ae16e
+
+RUN set -eux; \
+        \
+        apk add --no-cache --virtual .build-deps \
+                coreutils \
+                dpkg-dev dpkg \
+                gcc \
+                linux-headers \
+                make \
+                musl-dev \
+                openssl-dev \
+# install real "wget" to avoid:
+#   + wget -O redis.tar.gz http://download.redis.io/releases/redis-6.0.6.tar.gz
+#   Connecting to download.redis.io (45.60.121.1:80)
+#   wget: bad header line:     XxhODalH: btu; path=/; Max-Age=900
+                wget \
